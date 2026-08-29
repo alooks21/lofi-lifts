@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#efe9dd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1815" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Fully self-contained: no third-party anything. Nothing to frame, nothing
+     to fetch off-origin, no inline scripts. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>lofi lifts</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23efe9dd'/%3E%3Crect x='5' y='13' width='4' height='6' rx='1.5' fill='%232b2721'/%3E%3Crect x='23' y='13' width='4' height='6' rx='1.5' fill='%232b2721'/%3E%3Crect x='9' y='14.5' width='14' height='3' fill='%23b4593a'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23efe9dd'/%3E%3Crect x='5' y='13' width='4' height='6' rx='1.5' fill='%232b2721'/%3E%3Crect x='23' y='13' width='4' height='6' rx='1.5' fill='%232b2721'/%3E%3Crect x='9' y='14.5' width='14' height='3' fill='%23b4593a'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <h1>lofi&nbsp;lifts</h1>
+  </div>
+  <button id="unitBtn" class="ghost-btn" title="Toggle units">lb</button>
+</header>
+
+<main>
+
+  <!-- ══════════ LOG ══════════ -->
+  <section id="view-log" class="view active">
+
+    <div class="datebar">
+      <button class="nav-arrow" id="dayPrev" aria-label="Previous day">‹</button>
+      <div class="datebar-mid">
+        <div id="dateLabel" class="date-label">today</div>
+        <div id="dateSub" class="date-sub"></div>
+      </div>
+      <button class="nav-arrow" id="dayNext" aria-label="Next day">›</button>
+    </div>
+
+    <div class="chips" id="exerciseChips"></div>
+
+    <div class="panel entry">
+      <div class="last-ref" id="lastRef">no history yet</div>
+
+      <div class="steppers">
+        <div class="stepper">
+          <label for="weightIn">weight</label>
+          <div class="stepper-row">
+            <button class="step" data-target="weight" data-dir="-1" aria-label="Less weight">–</button>
+            <input id="weightIn" type="text" inputmode="decimal" value="135" autocomplete="off">
+            <button class="step" data-target="weight" data-dir="1" aria-label="More weight">+</button>
+          </div>
+          <div class="unit-tag" id="unitTag">lb</div>
+        </div>
+        <div class="stepper">
+          <label for="repsIn">reps</label>
+          <div class="stepper-row">
+            <button class="step" data-target="reps" data-dir="-1" aria-label="Fewer reps">–</button>
+            <input id="repsIn" type="text" inputmode="numeric" value="5" autocomplete="off">
+            <button class="step" data-target="reps" data-dir="1" aria-label="More reps">+</button>
+          </div>
+          <div class="unit-tag">×</div>
+        </div>
+      </div>
+
+      <button id="logBtn" class="primary-btn">log set</button>
+    </div>
+
+    <div class="sets-wrap">
+      <div class="section-label"><span id="setsTitle">today's sets</span><span id="volumeTag" class="tag"></span></div>
+      <ul id="setList" class="set-list"></ul>
+      <p id="setsEmpty" class="empty">nothing logged yet. pick a lift, punch in numbers, hit log.</p>
+    </div>
+
+  </section>
+
+  <!-- ══════════ PRs ══════════ -->
+  <section id="view-prs" class="view">
+    <div class="section-label">personal records</div>
+    <div id="prGrid" class="pr-grid"></div>
+    <p id="prEmpty" class="empty">log a few sets and your records show up here.</p>
+  </section>
+
+  <!-- ══════════ HISTORY ══════════ -->
+  <section id="view-history" class="view">
+    <div class="section-label"><span>history</span><span id="historyTag" class="tag"></span></div>
+    <div id="historyList"></div>
+    <p id="historyEmpty" class="empty">no sessions yet.</p>
+    <div class="danger-zone">
+      <button id="exportBtn" class="ghost-btn wide">export data (.json)</button>
+      <button id="wipeBtn" class="ghost-btn wide danger">erase everything</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- rest timer -->
+<div id="restBar" class="rest-bar" hidden>
+  <div class="rest-fill" id="restFill"></div>
+  <div class="rest-inner">
+    <span class="rest-label">rest</span>
+    <span class="rest-time" id="restTime">1:30</span>
+    <button class="rest-x" id="restDismiss" aria-label="Dismiss timer">×</button>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button class="tab active" data-view="log"><span class="ic">▤</span>log</button>
+  <button class="tab" data-view="prs"><span class="ic">★</span>PRs</button>
+  <button class="tab" data-view="history"><span class="ic">◷</span>history</button>
+</nav>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
